@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Styloxio — Checkout</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo">SX</div>
+        <div class="brand-text">
+          <div class="title">Styloxio</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="products.html" class="nav-link">Products</a>
+        <a href="cart.html" class="nav-link">Cart (<span id="cartCount">0</span>)</a>
+        <a href="orders.html" class="nav-link">Orders</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container checkout-main">
+    <h2>Checkout</h2>
+    <div class="checkout-grid">
+      <form id="checkoutForm" class="checkout-form">
+        <label>Full Name</label>
+        <input id="custName" type="text" placeholder="John Doe" required />
+
+        <label>Phone</label>
+        <input id="custPhone" type="text" placeholder="9876543210" required />
+
+        <label>Address</label>
+        <textarea id="custAddress" rows="4" placeholder="Street, City, Pincode" required></textarea>
+
+        <label>Payment Method</label>
+        <select id="paymentMethod" required>
+          <option value="">--Select Payment--</option>
+          <option value="cod">Cash on Delivery (COD)</option>
+          <option value="online">Online Payment (Razorpay)</option>
+        </select>
+
+        <button type="submit" class="cta">Place Order</button>
+      </form>
+
+      <div class="order-preview">
+        <h3>Order Preview</h3>
+        <div id="previewItems"></div>
+        <div class="summary-row"><strong>Total</strong><strong id="previewTotal">₹0</strong></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div>© 2025 Styloxio by Siddiqui's Industries</div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
