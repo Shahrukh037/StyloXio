@@ -1,76 +1,198 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>StyloXio Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>StyloXio Admin Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family:sans-serif; background:#0f172a; color:white; padding:20px; }
-    .card { background:#1e293b; padding:20px; border-radius:12px; margin:auto; max-width:420px; }
-    input { width:100%; padding:10px; margin:6px 0; border-radius:8px; border:1px solid #475569; background:#0f172a; color:white; }
-    button { padding:10px 18px; border-radius:8px; border:none; margin-top:10px; cursor:pointer; }
-    .btn-primary { background:#2563eb; color:white; }
-    .btn-outline { background:#334155; color:#cbd5e1; }
-    .hidden { display:none; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .card {
+      background: #020617;
+      border-radius: 14px;
+      padding: 20px 18px;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid #1f2937;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.15rem;
+    }
+    .sub {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 14px;
+    }
+    label {
+      font-size: 0.8rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+    input {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 8px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.6);
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      cursor: pointer;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: #f9fafb;
+    }
+    .btn-outline {
+      background: transparent;
+      color: #e5e7eb;
+      border: 1px solid #4b5563;
+    }
+    .status {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      min-height: 16px;
+      color: #e5e7eb;
+    }
+    .status.error { color: #fecaca; }
+    .status.ok { color: #bbf7d0; }
+    .tiny {
+      margin-top: 8px;
+      font-size: 0.72rem;
+      color: #9ca3af;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
+  <div class="card">
+    <h1>StyloXio Admin</h1>
+    <div class="sub">Login ya first admin create karke dashboard open karo.</div>
 
-<h2>StyloXio Admin Panel</h2>
-<p id="adminUserInfo">Not logged in</p>
+    <label for="loginEmail">Admin Email</label>
+    <input type="email" id="loginEmail" placeholder="admin@styloxio.com" />
 
-<!-- LOGIN CARD -->
-<div id="loginSection" class="card">
-  <h3>Admin Login</h3>
+    <label for="loginPassword">Password</label>
+    <input type="password" id="loginPassword" placeholder="Minimum 6 characters" />
 
-  <input type="email" id="loginEmail" placeholder="admin@styloxio.com">
-  <input type="password" id="loginPassword" placeholder="Password">
+    <div class="btn-row">
+      <button class="btn-primary" id="loginBtn">Login</button>
+      <button class="btn-outline" id="registerBtn">Create First Admin</button>
+    </div>
 
-  <button class="btn-primary" id="loginBtn">Login</button>
-  <button class="btn-outline" id="registerBtn">Create First Admin</button>
-  <p id="loginStatus"></p>
-</div>
+    <div id="loginStatus" class="status"></div>
 
-<!-- FIREBASE SDKs -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="firebase-config.js"></script>
+    <div class="tiny">
+      👉 Pehli baar use kar rahe ho?<br />
+      Email + password daal ke <b>Create First Admin</b> dabao.  
+      Account ban jayega & auto login ho kar dashboard par redirect.
+    </div>
+  </div>
 
-<script>
-  const auth = firebase.auth();
-  const $ = id => document.getElementById(id);
+  <!-- Firebase SDKs (v8) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  // AUTH STATE LISTENER
-  auth.onAuthStateChanged(user => {
-    if(user){
-      $("adminUserInfo").innerText = "Logged in as: " + user.email;
-      window.location.href = "admin-dashboard.html"; // 🔥 Auto redirect after login
+  <!-- Your config (yahi file repo me already hai) -->
+  <script src="firebase-config.js"></script>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const statusEl = $("loginStatus");
+
+    // Safety: check firebase loaded
+    if (typeof firebase === "undefined") {
+      statusEl.textContent = "Firebase load nahi hua. Internet / script tag check karo.";
+      statusEl.className = "status error";
     }
-  });
 
-  // LOGIN ADMIN
-  $("loginBtn").addEventListener("click", async () => {
-    $("loginStatus").innerText = "Logging in...";
-    try {
-      await auth.signInWithEmailAndPassword($("loginEmail").value, $("loginPassword").value);
-      $("loginStatus").innerText = "Login successful ✔ Redirecting...";
-      setTimeout(() => window.location.href = "admin-dashboard.html", 800);
-    } catch (e) {
-      $("loginStatus").innerText = e.message;
-    }
-  });
+    // If already logged in → direct dashboard
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        window.location.href = "admin-dashboard.html";
+      }
+    });
 
-  // CREATE FIRST ADMIN
-  $("registerBtn").addEventListener("click", async () => {
-    $("loginStatus").innerText = "Creating admin...";
-    try {
-      await auth.createUserWithEmailAndPassword($("loginEmail").value, $("loginPassword").value);
-      $("loginStatus").innerText = "Admin created ✔ Redirecting...";
-      setTimeout(() => window.location.href = "admin-dashboard.html", 800);
-    } catch (e) {
-      $("loginStatus").innerText = e.message;
-    }
-  });
-</script>
+    $("loginBtn").addEventListener("click", async () => {
+      const email = $("loginEmail").value.trim();
+      const pass  = $("loginPassword").value.trim();
+      if (!email || !pass) {
+        statusEl.textContent = "Email & password dono daalo.";
+        statusEl.className = "status error";
+        return;
+      }
+      statusEl.textContent = "Logging in…";
+      statusEl.className = "status";
 
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+        statusEl.textContent = "Login successful ✔ Redirecting…";
+        statusEl.className = "status ok";
+        window.location.href = "admin-dashboard.html";
+      } catch (e) {
+        statusEl.textContent = e.message;
+        statusEl.className = "status error";
+      }
+    });
+
+    $("registerBtn").addEventListener("click", async () => {
+      const email = $("loginEmail").value.trim();
+      const pass  = $("loginPassword").value.trim();
+      if (!email || !pass) {
+        statusEl.textContent = "Pehle email & password daalo.";
+        statusEl.className = "status error";
+        return;
+      }
+      if (pass.length < 6) {
+        statusEl.textContent = "Password kam se kam 6 character ka hona chahiye.";
+        statusEl.className = "status error";
+        return;
+      }
+
+      statusEl.textContent = "Creating admin account…";
+      statusEl.className = "status";
+
+      try {
+        await auth.createUserWithEmailAndPassword(email, pass);
+        statusEl.textContent = "Admin created ✔ Redirecting…";
+        statusEl.className = "status ok";
+        window.location.href = "admin-dashboard.html";
+      } catch (e) {
+        statusEl.textContent = e.message;
+        statusEl.className = "status error";
+      }
+    });
+  </script>
 </body>
 </html>
