@@ -1,32 +1,43 @@
-/* ---------- PRODUCT DATA ---------- */
-const PRODUCTS = [
-  { id: 1, name: "Rose Glow Face Serum (30ml)", category: "Cosmetics", price: 349, img: "images/red-roses-serum.jpg" },
-  { id: 2, name: "Classic Men White T-Shirt", category: "Clothes", price: 799, img: "images/white-t-shirt.jpg" },
-  { id: 3, name: "Aviator Sunglasses", category: "Accessories", price: 1199, img: "images/sunglasses.jpg" },
-  { id: 4, name: "Ladies Party Dress", category: "Clothes", price: 1299, img: "images/ladies-party-dress.jpg" },
-  { id: 5, name: "Minimalist Watch", category: "Accessories", price: 1599, img: "images/minimal-watch.jpg" }
-];
+/* ---------- FIRESTORE PRODUCT LOADER ---------- */
+let PRODUCTS = []; // will fill dynamically from Firestore
 
-/* ---------- STORAGE KEYS ---------- */
+async function loadProductsFromDB() {
+  try {
+    const snap = await db.collection("products").get();
+    PRODUCTS = snap.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+      price: doc.data().price,
+      img: doc.data().image || "",
+      category: doc.data().category || "",
+      stock: doc.data().stock || 0
+    }));
+
+    renderProductsPage();
+    updateCartCount();
+  } catch (e) {
+    console.error("Product load failed:", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadProductsFromDB);
+
+/* ---------- LOCAL STORAGE KEYS ---------- */
 const CART_KEY = 'styloxio_cart';
 const ORDERS_KEY = 'styloxio_orders';
 
-/* ---------- STORAGE HELPERS ---------- */
 function getCart(){ try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; } }
 function saveCart(cart){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); updateCartCount(); }
 function getOrders(){ try{ return JSON.parse(localStorage.getItem(ORDERS_KEY)) || []; } catch(e){ return []; } }
 function saveOrders(orders){ localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); }
 
-/* ---------- UPDATE NAV CART COUNT ---------- */
 function updateCartCount(){
   const count = getCart().reduce((s,i)=>s + (i.qty||1), 0);
   document.querySelectorAll('#cartCount').forEach(el => el.textContent = count);
 }
 
-/* ---------- ESCAPE HTML ---------- */
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
 
-/* ---------- TOAST ---------- */
 function showToast(msg){
   const t = document.createElement('div');
   t.textContent = msg;
@@ -35,6 +46,60 @@ function showToast(msg){
     padding:'10px 14px',borderRadius:'8px',boxShadow:'0 8px 30px rgba(15,23,42,0.15)',
     zIndex:9999,transition:'opacity 0.5s'
   });
+  document.body.appendChild(t);
+  setTimeout(()=> t.style.opacity='0',1500);
+  setTimeout(()=> t.remove(),2000);
+}
+
+function isValidPhone(phone){ return /^[6-9]\d{9}$/.test(phone); }
+
+/* ---------- RENDER PRODUCTS PAGE ---------- */
+function renderProductsPage(){
+  const grid = document.getElementById('productGrid');
+  if(!grid) return;
+  grid.innerHTML='';
+  const searchQ = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const filterCat = document.getElementById('filterCategory')?.value || '';
+  const list = PRODUCTS.filter(p=>{
+    if(filterCat && p.category!==filterCat) return false;
+    if(searchQ && !(p.name+p.category).toLowerCase().includes(searchQ)) return false;
+    return true;
+  });
+  list.forEach(p=>{
+    const card = document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <img src="${p.img}" alt="${escapeHtml(p.name)}" />
+      <div class="p-title">${escapeHtml(p.name)}</div>
+      <div class="p-cat">${escapeHtml(p.category)}</div>
+      <div class="p-price">₹${p.price}</div>
+      <div class="btn-row">
+        <button class="btn-primary" data-id="${p.id}" data-action="buy">Buy Now</button>
+        <button class="btn-accent" data-id="${p.id}" data-action="add">Add to Cart</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('button[data-action="add"]').forEach(b=>b.addEventListener('click',()=>addToCart(b.dataset.id)));
+  grid.querySelectorAll('button[data-action="buy"]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      addToCart(b.dataset.id);
+      window.location.href='checkout.html';
+    });
+  });
+}
+
+/* ---------- ADD TO CART ---------- */
+function addToCart(productId){
+  const product = PRODUCTS.find(p=>p.id===productId);
+  if(!product) return showToast('Product not found');
+  const cart = getCart();
+  const exist = cart.find(i=>i.id===productId);
+  if(exist) exist.qty=(exist.qty||1)+1; else cart.push({id:product.id,name:product.name,price:product.price,img:product.img,qty:1});
+  saveCart(cart);
+  showToast(`${product.name} added to cart`);
+}
+
+/* ---------- REST OF YOUR CART, CHECKOUT, ORDERS CODE UNCHANGED ---------- */  });
   document.body.appendChild(t);
   setTimeout(()=> t.style.opacity='0',1500);
   setTimeout(()=> t.remove(),2000);
