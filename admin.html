@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>StyloXio Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --dark: #020617;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-700: #374151;
+      --danger: #dc2626;
+      --success: #16a34a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 40%, #020617 100%);
+      color: #e5e7eb;
+      min-height: 100vh;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 0.75rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    header .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    header .brand-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    header .brand-sub {
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+
+    header .user-info {
+      font-size: 0.75rem;
+      color: #cbd5f5;
+    }
+
+    main {
+      flex: 1;
+      padding: 1.2rem 1rem 2rem;
+      max-width: 1120px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(30, 64, 175, 0.2);
+      color: #bfdbfe;
+      font-size: 0.7rem;
+      margin-top: 0.25rem;
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+    }
+
+    .grid {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    @media (min-width: 640px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #1f2937 0, #020617 70%);
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 0.9rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.55rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .card-sub {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .stats-grid {
+      display: grid;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(15, 23, 42, 0.9));
+      border-radius: 0.9rem;
+      padding: 0.75rem 0.8rem;
+      border: 1px solid rgba(129, 140, 248, 0.3);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #cbd5f5;
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.1rem;
+    }
+
+    .stat-note {
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.45rem 0.6rem;
+      border-radius: 0.6rem;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.8);
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.4);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.7rem;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.8rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #f9fafb;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #e5e7eb;
+      border-color: rgba(148, 163, 184, 0.8);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      color: #fee2e2;
+      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.45);
+    }
+
+    .btn-small {
+      padding: 0.25rem 0.6rem;
+      font-size: 0.7rem;
+      border-radius: 999px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      margin-top: 0.4rem;
+    }
+
+    th,
+    td {
+      padding: 0.4rem 0.4rem;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+      text-align: left;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    tr:hover td {
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .badge {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 0.05rem 0.4rem;
+      font-size: 0.7rem;
+      border: 1px solid transparent;
+    }
+
+    .badge-pending {
+      background: rgba(245, 158, 11, 0.1);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .badge-completed {
+      background: rgba(22, 163, 74, 0.1);
+      color: #4ade80;
+      border-color: rgba(22, 163, 74, 0.4);
+    }
+
+    .badge-cancelled {
+      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .muted {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .mt-1 {
+      margin-top: 0.5rem;
+    }
+
+    .mt-2 {
+      margin-top: 1rem;
+    }
+
+    .login-wrapper {
+      max-width: 420px;
+      margin: 3.5rem auto 0;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .divider {
+      height: 1px;
+      background: radial-gradient(circle, rgba(148, 163, 184, 0.8), transparent);
+      margin: 0.5rem 0 0.9rem;
+    }
+
+    .scroll-table {
+      max-height: 280px;
+      overflow: auto;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(55, 65, 81, 0.7);
+      background: radial-gradient(circle at top left, #020617 0, #020617 60%);
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .top-row h2 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .logout-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.5rem;
+    }
+
+    .tiny {
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <div class="brand">
+        <div class="brand-title">StyloXio Admin</div>
+        <div class="brand-sub">Control panel for products & orders</div>
+      </div>
+      <div class="user-info" id="adminUserInfo">Not logged in</div>
+    </header>
+
+    <main>
+      <!-- LOGIN CARD -->
+      <section id="loginSection" class="login-wrapper">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Admin Login</div>
+              <div class="card-sub">Use email & password to access StyloXio dashboard.</div>
+            </div>
+            <div class="pill">
+              <span class="pill-dot"></span>
+              Secure Firebase Auth
+            </div>
+          </div>
+
+          <div class="grid grid-2 mt-1">
+            <div>
+              <label for="loginEmail">Admin email</label>
+              <input type="email" id="loginEmail" placeholder="admin@styloxio.com" />
+            </div>
+            <div>
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" placeholder="••••••••" />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" id="loginBtn">Login</button>
+            <button class="btn btn-outline" id="registerBtn">Create first admin</button>
+            <span id="loginStatus" class="muted"></span>
+          </div>
+
+          <p class="tiny mt-1">
+            👉 Pehli baar use kar rahe ho? <br />
+            <strong>"Create first admin"</strong> dabao → email + password se ek admin account banega.
+          </p>
+        </div>
+      </section>
+
+      <!-- MAIN ADMIN CONTENT -->
+      <section id="adminSection" class="hidden">
+        <!-- DASHBOARD STATS -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Dashboard</div>
+              <div class="card-sub">Quick overview of StyloXio activity.</div>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Products</div>
+              <div class="stat-value" id="statProducts">0</div>
+              <div class="stat-note">Active items in catalog</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total Orders</div>
+              <div class="stat-value" id="statOrders">0</div>
+              <div class="stat-note">All time orders</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Pending Orders</div>
+              <div class="stat-value" id="statPending">0</div>
+              <div class="stat-note">Need your action</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Revenue (₹)</div>
+              <div class="stat-value" id="statRevenue">0</div>
+              <div class="stat-note">Completed orders total</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div class="card">
+          <div class="top-row">
+            <div>
+              <h2>Products</h2>
+              <span class="card-sub">Add / edit / delete StyloXio products.</span>
+            </div>
+          </div>
+
+          <form id="productForm" class="mt-1">
+            <input type="hidden" id="productId" />
+            <div class="grid grid-3">
+              <div>
+                <label for="productName">Name</label>
+                <input type="text" id="productName" placeholder="Black Hoodie" required />
+              </div>
+              <div>
+                <label for="productPrice">Price (₹)</label>
+                <input type="number" id="productPrice" placeholder="1499" min="0" required />
+              </div>
+              <div>
+                <label for="productStock">Stock</label>
+                <input type="number" id="productStock" placeholder="10" min="0" required />
+              </div>
+            </div>
+
+            <div class="grid grid-2 mt-1">
+              <div>
+                <label for="productCategory">Category</label>
+                <input type="text" id="productCategory" placeholder="Hoodies / Shoes / Watch" required />
+              </div>
+              <div>
+                <label for="productImage">Image URL</label>
+                <input type="url" id="productImage" placeholder="https://your-image-url" />
+              </div>
+            </div>
+
+            <div class="mt-1">
+              <label for="productDescription">Description</label>
+              <textarea id="productDescription" rows="2" placeholder="Short description for this product"></textarea>
+            </div>
+
+            <div class="btn-row">
+              <button type="submit" class="btn btn-primary">Save Product</button>
+              <button type="button" id="clearProductForm" class="btn btn-outline">Clear</button>
+            </div>
+          </form>
+
+          <div class="divider"></div>
+
+          <div class="scroll-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody">
+                <tr>
+                  <td colspan="5" class="muted" style="text-align:center;padding:0.8rem;">
+                    Loading products...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ORDERS -->
+        <div class="card">
+          <div class="top-row">
+            <div>
+              <h2>Orders</h2>
+              <span class="card-sub">All orders placed from StyloXio website.</span>
+            </div>
+          </div>
+
+          <div class="scroll-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Total (₹)</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <tr>
+                  <td colspan="5" class="muted" style="text-align:center;padding:0.8rem;">
+                    Loading orders...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="logout-row">
+          <button class="btn btn-danger btn-small" id="logoutBtn">Logout</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <!-- Your Firebase config (already created in repo) -->
+  <script src="firebase-config.js"></script>
+
+  <script>
+    // shortcuts
+    const $ = (id) => document.getElementById(id);
+
+    const loginSection = $("loginSection");
+    const adminSection = $("adminSection");
+    const adminUserInfo = $("adminUserInfo");
+    const loginStatus = $("loginStatus");
+
+    const loginEmail = $("loginEmail");
+    const loginPassword = $("loginPassword");
+    const loginBtn = $("loginBtn");
+    const registerBtn = $("registerBtn");
+    const logoutBtn = $("logoutBtn");
+
+    // STAT elements
+    const statProducts = $("statProducts");
+    const statOrders = $("statOrders");
+    const statPending = $("statPending");
+    const statRevenue = $("statRevenue");
+
+    // Firestore refs
+    const productsCol = () => db.collection("products");
+    const ordersCol = () => db.collection("orders");
+
+    // AUTH STATE
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        loginSection.classList.add("hidden");
+        adminSection.classList.remove("hidden");
+        adminUserInfo.textContent = "Logged in as " + (user.email || "admin");
+        loginStatus.textContent = "";
+        loadProducts();
+        loadOrders();
+        updateStats();
+      } else {
+        loginSection.classList.remove("hidden");
+        adminSection.classList.add("hidden");
+        adminUserInfo.textContent = "Not logged in";
+      }
+    });
+
+    // LOGIN
+    loginBtn.addEventListener("click", async () => {
+      loginStatus.textContent = "Logging in...";
+      try {
+        await auth.signInWithEmailAndPassword(
+          loginEmail.value.trim(),
+          loginPassword.value.trim()
+        );
+        loginStatus.textContent = "Logged in ✔";
+      } catch (err) {
+        loginStatus.textContent = "Error: " + err.message;
+      }
+    });
+
+    // FIRST ADMIN REGISTER
+    registerBtn.addEventListener("click", async () => {
+      loginStatus.textContent = "Creating admin account...";
+      try {
+        await auth.createUserWithEmailAndPassword(
+          loginEmail.value.trim(),
+          loginPassword.value.trim()
+        );
+        loginStatus.textContent = "Admin created & logged in ✔";
+      } catch (err) {
+        loginStatus.textContent = "Error: " + err.message;
+      }
+    });
+
+    // LOGOUT
+    logoutBtn.addEventListener("click", async () => {
+      await auth.signOut();
+    });
+
+    // PRODUCT FORM
+    const productForm = $("productForm");
+    const clearProductFormBtn = $("clearProductForm");
+    const productsTableBody = $("productsTableBody");
+
+    function clearProductForm() {
+      productForm.reset();
+      $("productId").value = "";
+    }
+
+    clearProductFormBtn.addEventListener("click", clearProductForm);
+
+    productForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = $("productId").value;
+
+      const data = {
+        name: $("productName").value.trim(),
+        price: Number($("productPrice").value),
+        stock: Number($("productStock").value),
+        category: $("productCategory").value.trim(),
+        imageUrl: $("productImage").value.trim(),
+        description: $("productDescription").value.trim(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      if (!data.name || isNaN(data.price) || isNaN(data.stock)) {
+        alert("Please fill all required fields correctly.");
+        return;
+      }
+
+      try {
+        if (id) {
+          await productsCol().doc(id).set(data, { merge: true });
+        } else {
+          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await productsCol().add(data);
+        }
+        clearProductForm();
+        await loadProducts();
+        await updateStats();
+        alert("Product saved ✔");
+      } catch (err) {
+        alert("Error saving product: " + err.message);
+      }
+    });
+
+    async function loadProducts() {
+      productsTableBody.innerHTML =
+        '<tr><td colspan="5" class="muted" style="text-align:center;padding:0.8rem;">Loading...</td></tr>';
+      try {
+        let snap;
+        try {
+          snap = await productsCol().orderBy("createdAt", "desc").get();
+        } catch {
+          snap = await productsCol().get();
+        }
+
+        if (snap.empty) {
+          productsTableBody.innerHTML =
+            '<tr><td colspan="5" class="muted" style="text-align:center;padding:0.8rem;">No products added yet.</td></tr>';
+          return;
+        }
+
+        productsTableBody.innerHTML = "";
+        snap.forEach((doc) => {
+          const p = doc.data();
+          const tr = document.createElement("tr");
+
+          const tdName = document.createElement("td");
+          tdName.textContent = p.name || "-";
+
+          const tdCat = document.createElement("td");
+          tdCat.textContent = p.category || "-";
+
+          const tdPrice = document.createElement("td");
+          tdPrice.textContent = p.price || 0;
+
+          const tdStock = document.createElement("td");
+          tdStock.textContent = p.stock || 0;
+
+          const tdActions = document.createElement("td");
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "Edit";
+          editBtn.className = "btn btn-outline btn-small";
+          editBtn.addEventListener("click", () => fillProductForm(doc.id, p));
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "Delete";
+          deleteBtn.className = "btn btn-danger btn-small";
+          deleteBtn.style.marginLeft = "0.3rem";
+          deleteBtn.addEventListener("click", () => deleteProduct(doc.id));
+
+          tdActions.appendChild(editBtn);
+          tdActions.appendChild(deleteBtn);
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdCat);
+          tr.appendChild(tdPrice);
+          tr.appendChild(tdStock);
+          tr.appendChild(tdActions);
+
+          productsTableBody.appendChild(tr);
+        });
+      } catch (err) {
+        productsTableBody.innerHTML =
+          '<tr><td colspan="5" class="muted" style="color:#fecaca;text-align:center;padding:0.8rem;">Error: ' +
+          err.message +
+          "</td></tr>";
+      }
+    }
+
+    function fillProductForm(id, p) {
+      $("productId").value = id;
+      $("productName").value = p.name || "";
+      $("productPrice").value = p.price || 0;
+      $("productStock").value = p.stock || 0;
+      $("productCategory").value = p.category || "";
+      $("productImage").value = p.imageUrl || "";
+      $("productDescription").value = p.description || "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm("Delete this product?")) return;
+      try {
+        await productsCol().doc(id).delete();
+        await loadProducts();
+        await updateStats();
+      } catch (err) {
+        alert("Error deleting product: " + err.message);
+      }
+    }
+
+    // ORDERS
+    const ordersTableBody = $("ordersTableBody");
+
+    async function loadOrders() {
+      ordersTableBody.innerHTML =
+        '<tr><td colspan="5" class="muted" style="text-align:center;padding:0.8rem;">Loading...</td></tr>';
+      try {
+        let snap;
+        try {
+          snap = await ordersCol().orderBy("createdAt", "desc").limit(150).get();
+        } catch {
+          snap = await ordersCol().get();
+        }
+
+        if (snap.empty) {
+          ordersTableBody.innerHTML =
+            '<tr><td colspan="5" class="muted" style="text-align:center;padding:0.8rem;">No orders yet.</td></tr>';
+          return;
+        }
+
+        ordersTableBody.innerHTML = "";
+        snap.forEach((doc) => {
+          const o = doc.data();
+          const tr = document.createElement("tr");
+
+          const tdId = document.createElement("td");
+          tdId.textContent = doc.id;
+
+          const tdCustomer = document.createElement("td");
+          tdCustomer.textContent = o.customerName || "-";
+
+          const tdTotal = document.createElement("td");
+          tdTotal.textContent = o.total || 0;
+
+          const tdStatus = document.createElement("td");
+          const span = document.createElement("span");
+          const status = (o.status || "pending").toLowerCase();
+          span.textContent = status;
+          span.classList.add("badge");
+          if (status === "completed") span.classList.add("badge-completed");
+          else if (status === "cancelled") span.classList.add("badge-cancelled");
+          else span.classList.add("badge-pending");
+          tdStatus.appendChild(span);
+
+          const tdDate = document.createElement("td");
+          if (o.createdAt && o.createdAt.toDate) {
+            tdDate.textContent = o.createdAt.toDate().toLocaleString();
+          } else {
+            tdDate.textContent = "-";
+          }
+
+          tr.appendChild(tdId);
+          tr.appendChild(tdCustomer);
+          tr.appendChild(tdTotal);
+          tr.appendChild(tdStatus);
+          tr.appendChild(tdDate);
+
+          ordersTableBody.appendChild(tr);
+        });
+
+        await updateStatsFromSnapshot(snap);
+      } catch (err) {
+        ordersTableBody.innerHTML =
+          '<tr><td colspan="5" class="muted" style="color:#fecaca;text-align:center;padding:0.8rem;">Error: ' +
+          err.message +
+          "</td></tr>";
+      }
+    }
+
+    // STATS
+    async function updateStats() {
+      // products count
+      try {
+        const prodSnap = await productsCol().get();
+        statProducts.textContent = prodSnap.size;
+      } catch {
+        statProducts.textContent = "0";
+      }
+
+      try {
+        const ordSnap = await ordersCol().get();
+        await updateStatsFromSnapshot(ordSnap);
+      } catch {
+        statOrders.textContent = "0";
+        statPending.textContent = "0";
+        statRevenue.textContent = "0";
+      }
+    }
+
+    async function updateStatsFromSnapshot(ordSnap) {
+      const totalOrders = ordSnap.size;
+      let pending = 0;
+      let revenue = 0;
+
+      ordSnap.forEach((doc) => {
+        const o = doc.data();
+        const status = (o.status || "pending").toLowerCase();
+        if (status === "pending") pending++;
+        if (status === "completed") {
+          revenue += Number(o.total || 0);
+        }
+      });
+
+      statOrders.textContent = totalOrders;
+      statPending.textContent = pending;
+      statRevenue.textContent = revenue;
+    }
+  </script>
+</body>
+</html>
