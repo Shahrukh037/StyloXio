@@ -1,175 +1,326 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>StyloXio Admin Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { background:#0f172a; color:white; font-family:sans-serif; margin:0; }
-    header { background:#1e293b; padding:16px; font-size:20px; text-align:center; border-bottom:1px solid #334155; }
-    .container { padding:20px; max-width:900px; margin:auto; }
-
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+    }
+    header {
+      background: #020617;
+      border-bottom: 1px solid #1f2937;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      font-size: 1rem;
+      margin: 0;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 16px;
+    }
     .card {
-      background:#1e293b;
-      padding:16px; border-radius:10px; margin-bottom:20px;
-      border:1px solid #334155;
+      background: #020617;
+      border-radius: 12px;
+      padding: 14px 14px 12px;
+      margin-bottom: 16px;
+      border: 1px solid #1f2937;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
     }
-
-    input,textarea {
-      width:100%; padding:10px; margin-top:6px;
-      background:#0f172a; border:1px solid #475569; border-radius:6px; color:white;
+    h2 {
+      font-size: 0.95rem;
+      margin: 0 0 8px;
     }
-
-    button {
-      margin-top:10px; padding:10px 18px; border:none;
-      border-radius:6px; cursor:pointer; font-weight:bold;
+    label {
+      font-size: 0.78rem;
+      display: block;
+      margin-bottom: 3px;
     }
-
-    .btn-primary { background:#2563eb; color:white; }
-    .btn-danger { background:#dc2626; color:white; }
-    .btn-edit { background:#334155; color:#cbd5e1; margin-right:6px; }
-
+    input, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.6);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .btn {
+      border: none;
+      cursor: pointer;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-right: 6px;
+      margin-top: 4px;
+    }
+    .btn-primary { background: #2563eb; color: #f9fafb; }
+    .btn-outline { background: transparent; color:#e5e7eb; border:1px solid #4b5563; }
+    .btn-danger { background:#dc2626; color:#fee2e2; }
     table {
-      width:100%; border-collapse:collapse; margin-top:12px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
     }
-
-    th,td { padding:10px; border-bottom:1px solid #334155; }
-    th { background:#0f172a; color:#cbd5e1; text-align:left; }
-
-    .logout-btn {
-      background:#dc2626; float:right; margin-top:10px; padding:8px 14px;
+    th, td {
+      padding: 6px 6px;
+      border-bottom: 1px solid #111827;
+      text-align: left;
+    }
+    th {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      background: #020617;
+      position: sticky;
+      top: 0;
+    }
+    .status {
+      font-size: 0.78rem;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+    .status.error { color:#fecaca; }
+    .status.ok { color:#bbf7d0; }
+    .small {
+      font-size: 0.72rem;
+      color:#9ca3af;
+      margin-top: 6px;
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1>StyloXio Admin Dashboard</h1>
+    <div>
+      <span id="adminEmail" style="font-size:0.75rem;color:#9ca3af;margin-right:8px;"></span>
+      <button class="btn btn-danger" id="logoutBtn">Logout</button>
+    </div>
+  </header>
 
-<header>
-  StyloXio Admin Dashboard
-  <button class="logout-btn" id="logoutBtn">Logout</button>
-</header>
+  <div class="container">
+    <!-- Product form -->
+    <div class="card">
+      <h2>Product Add / Edit</h2>
+      <div class="grid-2">
+        <div>
+          <label for="pName">Name</label>
+          <input id="pName" type="text" placeholder="Black Hoodie" />
+        </div>
+        <div>
+          <label for="pCategory">Category</label>
+          <input id="pCategory" type="text" placeholder="Hoodies / Shoes / Watch" />
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="pPrice">Price (₹)</label>
+          <input id="pPrice" type="number" min="0" />
+        </div>
+        <div>
+          <label for="pStock">Stock</label>
+          <input id="pStock" type="number" min="0" />
+        </div>
+      </div>
+      <label for="pImage">Image URL</label>
+      <input id="pImage" type="url" placeholder="https://image-link" />
+      <label for="pDesc">Description</label>
+      <textarea id="pDesc" rows="2" placeholder="Short product description"></textarea>
 
-<div class="container">
+      <input type="hidden" id="pId" />
 
-  <!-- PRODUCT ADD FORM -->
-  <div class="card">
-    <h3>Add / Edit Product</h3>
+      <button class="btn btn-primary" id="saveProductBtn">Save Product</button>
+      <button class="btn btn-outline" id="clearFormBtn">Clear</button>
 
-    <input type="text" id="pname" placeholder="Product name">
-    <input type="number" id="pprice" placeholder="Price (₹)">
-    <input type="number" id="pstock" placeholder="Stock">
-    <input type="text" id="pcategory" placeholder="Category (Shoes / Hoodie)">
-    <input type="text" id="pimage" placeholder="Image URL">
-    <textarea id="pdesc" placeholder="Product Description"></textarea>
+      <div id="productStatus" class="status"></div>
+      <div class="small">🛈 Products Firestore me "products" collection ke andar store honge.</div>
+    </div>
 
-    <button class="btn-primary" id="saveProductBtn">Save Product</button>
+    <!-- Product list -->
+    <div class="card">
+      <h2>Products List</h2>
+      <div style="max-height:300px;overflow:auto;border-radius:10px;border:1px solid #111827;">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Cat</th>
+              <th>₹</th>
+              <th>Stock</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsBody">
+            <tr><td colspan="5">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <!-- PRODUCTS LIST -->
-  <div class="card">
-    <h3>Products List</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th><th>Price</th><th>Stock</th><th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="productsBody">
-        <tr><td colspan="4">Loading products...</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script>
 
-</div>
+  <script>
+    const $ = id => document.getElementById(id);
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-<script src="firebase-config.js"></script>
-
-<script>
-  const db = firebase.firestore();
-  const auth = firebase.auth();
-  let editId = null;
-
-  auth.onAuthStateChanged(user=>{
-    if(!user){
-      window.location.href = "admin.html";
-    }
-  });
-
-  document.getElementById("logoutBtn").addEventListener("click",()=>auth.signOut());
-
-  // SAVE PRODUCT
-  document.getElementById("saveProductBtn").addEventListener("click", async ()=>{
-    const data = {
-      name: pname.value,
-      price: Number(pprice.value),
-      stock: Number(pstock.value),
-      category: pcategory.value,
-      image: pimage.value,
-      desc: pdesc.value,
-      updatedAt: new Date()
-    };
-
-    if(editId){
-      await db.collection("products").doc(editId).set(data,{merge:true});
-      editId = null;
-      alert("Product Updated ✔");
-    } else {
-      data.createdAt = new Date();
-      await db.collection("products").add(data);
-      alert("Product Added ✔");
-    }
-
-    loadProducts();
-    pname.value = pprice.value = pstock.value = pcategory.value = pimage.value = pdesc.value = "";
-  });
-
-  async function loadProducts(){
-    const snap = await db.collection("products").orderBy("createdAt","desc").get();
-    const body = document.getElementById("productsBody");
-
-    if(snap.empty){
-      body.innerHTML = "<tr><td colspan='4'>No products yet</td></tr>";
-      return;
-    }
-
-    body.innerHTML = "";
-    snap.forEach(doc=>{
-      const p = doc.data();
-      body.innerHTML += `
-        <tr>
-          <td>${p.name}</td>
-          <td>₹${p.price}</td>
-          <td>${p.stock}</td>
-          <td>
-            <button class='btn-edit' onclick='editProduct("${doc.id}",${JSON.stringify(p).replace(/"/g,"&quot;")})'>Edit</button>
-            <button class='btn-danger' onclick='deleteProduct("${doc.id}")'>Delete</button>
-          </td>
-        </tr>`;
+    // Guard: only logged-in admin allowed
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "admin.html";
+      } else {
+        $("adminEmail").textContent = user.email || "";
+        loadProducts();
+      }
     });
-  }
 
-  function editProduct(id,p){
-    editId = id;
-    pname.value = p.name;
-    pprice.value = p.price;
-    pstock.value = p.stock;
-    pcategory.value = p.category;
-    pimage.value = p.image;
-    pdesc.value = p.desc;
-  }
+    $("logoutBtn").addEventListener("click", () => auth.signOut());
 
-  async function deleteProduct(id){
-    if(confirm("Delete this product?")){
-      await db.collection("products").doc(id).delete();
-      loadProducts();
+    const productsCol = () => db.collection("products");
+
+    function clearForm() {
+      $("pId").value = "";
+      $("pName").value = "";
+      $("pCategory").value = "";
+      $("pPrice").value = "";
+      $("pStock").value = "";
+      $("pImage").value = "";
+      $("pDesc").value = "";
+      $("productStatus").textContent = "";
+      $("productStatus").className = "status";
     }
-  }
+    $("clearFormBtn").addEventListener("click", clearForm);
 
-  loadProducts();
-</script>
+    $("saveProductBtn").addEventListener("click", async () => {
+      const id   = $("pId").value;
+      const name = $("pName").value.trim();
+      const cat  = $("pCategory").value.trim();
+      const price= Number($("pPrice").value);
+      const stock= Number($("pStock").value);
+      const img  = $("pImage").value.trim();
+      const desc = $("pDesc").value.trim();
 
+      const statusEl = $("productStatus");
+      if (!name || !cat || isNaN(price) || isNaN(stock)) {
+        statusEl.textContent = "Please fill name, category, price & stock.";
+        statusEl.className = "status error";
+        return;
+      }
+
+      const data = {
+        name,
+        category: cat,
+        price,
+        stock,
+        image: img,
+        description: desc,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      try {
+        if (id) {
+          await productsCol().doc(id).set(data, { merge: true });
+        } else {
+          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await productsCol().add(data);
+        }
+        statusEl.textContent = "Product saved ✔";
+        statusEl.className = "status ok";
+        clearForm();
+        loadProducts();
+      } catch (e) {
+        statusEl.textContent = e.message;
+        statusEl.className = "status error";
+      }
+    });
+
+    async function loadProducts() {
+      const body = $("productsBody");
+      body.innerHTML = "<tr><td colspan='5'>Loading…</td></tr>";
+      try {
+        let snap;
+        try {
+          snap = await productsCol().orderBy("createdAt","desc").get();
+        } catch {
+          snap = await productsCol().get();
+        }
+        if (snap.empty) {
+          body.innerHTML = "<tr><td colspan='5'>No products yet.</td></tr>";
+          return;
+        }
+        body.innerHTML = "";
+        snap.forEach(doc => {
+          const p = doc.data();
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${p.name || "-"}</td>
+            <td>${p.category || "-"}</td>
+            <td>₹${p.price || 0}</td>
+            <td>${p.stock || 0}</td>
+            <td>
+              <button class="btn btn-outline" data-id="${doc.id}" data-action="edit">Edit</button>
+              <button class="btn btn-danger" data-id="${doc.id}" data-action="delete">Delete</button>
+            </td>
+          `;
+          body.appendChild(tr);
+        });
+
+        // attach events
+        body.querySelectorAll("button[data-action='edit']").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const id = btn.dataset.id;
+            const row = btn.closest("tr");
+            $("pId").value = id;
+            $("pName").value = row.children[0].textContent;
+            $("pCategory").value = row.children[1].textContent;
+            $("pPrice").value = parseFloat(row.children[2].textContent.replace("₹","")) || 0;
+            $("pStock").value = parseInt(row.children[3].textContent, 10) || 0;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+        });
+
+        body.querySelectorAll("button[data-action='delete']").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const id = btn.dataset.id;
+            if (!confirm("Delete this product?")) return;
+            await productsCol().doc(id).delete();
+            loadProducts();
+          });
+        });
+      } catch (e) {
+        $("productsBody").innerHTML =
+          "<tr><td colspan='5' style='color:#fecaca;'>Error: " + e.message + "</td></tr>";
+      }
+    }
+  </script>
 </body>
 </html>
