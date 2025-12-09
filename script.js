@@ -99,6 +99,71 @@ function addToCart(productId){
   showToast(`${product.name} added to cart`);
 }
 
+/* ---------- REST OF YOUR CART, CHECKOUT, ORDERS CODE UNCHANGED ---------- */}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style,{
+    position:'fixed',right:'18px',bottom:'18px',background:'#0b2a66',color:'#fff',
+    padding:'10px 14px',borderRadius:'8px',boxShadow:'0 8px 30px rgba(15,23,42,0.15)',
+    zIndex:9999,transition:'opacity 0.5s'
+  });
+  document.body.appendChild(t);
+  setTimeout(()=> t.style.opacity='0',1500);
+  setTimeout(()=> t.remove(),2000);
+}
+
+function isValidPhone(phone){ return /^[6-9]\d{9}$/.test(phone); }
+
+/* ---------- RENDER PRODUCTS PAGE ---------- */
+function renderProductsPage(){
+  const grid = document.getElementById('productGrid');
+  if(!grid) return;
+  grid.innerHTML='';
+  const searchQ = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const filterCat = document.getElementById('filterCategory')?.value || '';
+  const list = PRODUCTS.filter(p=>{
+    if(filterCat && p.category!==filterCat) return false;
+    if(searchQ && !(p.name+p.category).toLowerCase().includes(searchQ)) return false;
+    return true;
+  });
+  list.forEach(p=>{
+    const card = document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <img src="${p.img}" alt="${escapeHtml(p.name)}" />
+      <div class="p-title">${escapeHtml(p.name)}</div>
+      <div class="p-cat">${escapeHtml(p.category)}</div>
+      <div class="p-price">₹${p.price}</div>
+      <div class="btn-row">
+        <button class="btn-primary" data-id="${p.id}" data-action="buy">Buy Now</button>
+        <button class="btn-accent" data-id="${p.id}" data-action="add">Add to Cart</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('button[data-action="add"]').forEach(b=>b.addEventListener('click',()=>addToCart(b.dataset.id)));
+  grid.querySelectorAll('button[data-action="buy"]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      addToCart(b.dataset.id);
+      window.location.href='checkout.html';
+    });
+  });
+}
+
+/* ---------- ADD TO CART ---------- */
+function addToCart(productId){
+  const product = PRODUCTS.find(p=>p.id===productId);
+  if(!product) return showToast('Product not found');
+  const cart = getCart();
+  const exist = cart.find(i=>i.id===productId);
+  if(exist) exist.qty=(exist.qty||1)+1; else cart.push({id:product.id,name:product.name,price:product.price,img:product.img,qty:1});
+  saveCart(cart);
+  showToast(`${product.name} added to cart`);
+}
+
 /* ---------- REST OF YOUR CART, CHECKOUT, ORDERS CODE UNCHANGED ---------- */  });
   document.body.appendChild(t);
   setTimeout(()=> t.style.opacity='0',1500);
