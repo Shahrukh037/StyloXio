@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>StyloXio Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background:#0f172a; color:white; font-family:sans-serif; margin:0; }
+    header { background:#1e293b; padding:16px; font-size:20px; text-align:center; border-bottom:1px solid #334155; }
+    .container { padding:20px; max-width:900px; margin:auto; }
+
+    .card {
+      background:#1e293b;
+      padding:16px; border-radius:10px; margin-bottom:20px;
+      border:1px solid #334155;
+    }
+
+    input,textarea {
+      width:100%; padding:10px; margin-top:6px;
+      background:#0f172a; border:1px solid #475569; border-radius:6px; color:white;
+    }
+
+    button {
+      margin-top:10px; padding:10px 18px; border:none;
+      border-radius:6px; cursor:pointer; font-weight:bold;
+    }
+
+    .btn-primary { background:#2563eb; color:white; }
+    .btn-danger { background:#dc2626; color:white; }
+    .btn-edit { background:#334155; color:#cbd5e1; margin-right:6px; }
+
+    table {
+      width:100%; border-collapse:collapse; margin-top:12px;
+    }
+
+    th,td { padding:10px; border-bottom:1px solid #334155; }
+    th { background:#0f172a; color:#cbd5e1; text-align:left; }
+
+    .logout-btn {
+      background:#dc2626; float:right; margin-top:10px; padding:8px 14px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  StyloXio Admin Dashboard
+  <button class="logout-btn" id="logoutBtn">Logout</button>
+</header>
+
+<div class="container">
+
+  <!-- PRODUCT ADD FORM -->
+  <div class="card">
+    <h3>Add / Edit Product</h3>
+
+    <input type="text" id="pname" placeholder="Product name">
+    <input type="number" id="pprice" placeholder="Price (₹)">
+    <input type="number" id="pstock" placeholder="Stock">
+    <input type="text" id="pcategory" placeholder="Category (Shoes / Hoodie)">
+    <input type="text" id="pimage" placeholder="Image URL">
+    <textarea id="pdesc" placeholder="Product Description"></textarea>
+
+    <button class="btn-primary" id="saveProductBtn">Save Product</button>
+  </div>
+
+  <!-- PRODUCTS LIST -->
+  <div class="card">
+    <h3>Products List</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th><th>Price</th><th>Stock</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productsBody">
+        <tr><td colspan="4">Loading products...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script src="firebase-config.js"></script>
+
+<script>
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+  let editId = null;
+
+  auth.onAuthStateChanged(user=>{
+    if(!user){
+      window.location.href = "admin.html";
+    }
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click",()=>auth.signOut());
+
+  // SAVE PRODUCT
+  document.getElementById("saveProductBtn").addEventListener("click", async ()=>{
+    const data = {
+      name: pname.value,
+      price: Number(pprice.value),
+      stock: Number(pstock.value),
+      category: pcategory.value,
+      image: pimage.value,
+      desc: pdesc.value,
+      updatedAt: new Date()
+    };
+
+    if(editId){
+      await db.collection("products").doc(editId).set(data,{merge:true});
+      editId = null;
+      alert("Product Updated ✔");
+    } else {
+      data.createdAt = new Date();
+      await db.collection("products").add(data);
+      alert("Product Added ✔");
+    }
+
+    loadProducts();
+    pname.value = pprice.value = pstock.value = pcategory.value = pimage.value = pdesc.value = "";
+  });
+
+  async function loadProducts(){
+    const snap = await db.collection("products").orderBy("createdAt","desc").get();
+    const body = document.getElementById("productsBody");
+
+    if(snap.empty){
+      body.innerHTML = "<tr><td colspan='4'>No products yet</td></tr>";
+      return;
+    }
+
+    body.innerHTML = "";
+    snap.forEach(doc=>{
+      const p = doc.data();
+      body.innerHTML += `
+        <tr>
+          <td>${p.name}</td>
+          <td>₹${p.price}</td>
+          <td>${p.stock}</td>
+          <td>
+            <button class='btn-edit' onclick='editProduct("${doc.id}",${JSON.stringify(p).replace(/"/g,"&quot;")})'>Edit</button>
+            <button class='btn-danger' onclick='deleteProduct("${doc.id}")'>Delete</button>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function editProduct(id,p){
+    editId = id;
+    pname.value = p.name;
+    pprice.value = p.price;
+    pstock.value = p.stock;
+    pcategory.value = p.category;
+    pimage.value = p.image;
+    pdesc.value = p.desc;
+  }
+
+  async function deleteProduct(id){
+    if(confirm("Delete this product?")){
+      await db.collection("products").doc(id).delete();
+      loadProducts();
+    }
+  }
+
+  loadProducts();
+</script>
+
+</body>
+</html>
